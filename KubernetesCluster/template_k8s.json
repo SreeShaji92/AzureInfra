@@ -1,0 +1,279 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Managed Cluster resource."
+            },
+            "defaultValue": "KUBECLUSTER_NAME"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "UK West",
+            "metadata": {
+                "description": "The location of AKS resource."
+            }
+        },
+        
+        "osDiskSizeGB": {
+            "type": "int",
+            "defaultValue": 100,
+            "metadata": {
+                "description": "Disk size (in GiB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize."
+            },
+            "minValue": 0,
+            "maxValue": 1023
+        },
+        "kubernetesVersion": {
+            "type": "string",
+            "defaultValue": "1.17.7",
+            "metadata": {
+                "description": "The version of Kubernetes."
+            }
+        },
+        "networkPlugin": {
+            "type": "string",
+            "defaultValue": "azure",
+            "allowedValues": [
+                "azure",
+                "kubenet"
+            ],
+            "metadata": {
+                "description": "Network plugin used for building Kubernetes network."
+            }
+        },
+        "enableRBAC": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Boolean flag to turn on and off of RBAC."
+            }
+        },
+        "servicePrincipalClientId": {
+            "metadata": {
+                "description": "Client ID (used by cloudprovider)."
+            },
+            "type": "securestring",
+            "defaultValue": "UNIQUE_CLIENT_ID"
+        },
+        "servicePrincipalObjectId": {
+            "metadata": {
+                "description": "Object ID (used by cloudprovider)."
+            },
+            "type": "securestring",
+            "defaultValue": "UNIQUE_OBJECT_ID"
+        },
+        "servicePrincipalClientSecret": {
+            "metadata": {
+                "description": "The Service Principal Client Secret."
+            },
+            "type": "securestring",
+            "defaultValue": "UNIQUE_SECRET"
+        },
+        "enableHttpApplicationRouting": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Boolean flag to turn on and off http application routing."
+            }
+        },
+        
+        "serviceCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "A CIDR notation IP range from which to assign service cluster IPs."
+            },
+            "defaultValue": "CIDR"
+        },
+        "dnsServiceIP": {
+            "type": "string",
+            "metadata": {
+                "description": "Containers DNS server IP address."
+            },
+            "defaultValue": "IP_ADDRESS"
+        },
+        "dockerBridgeCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "A CIDR notation IP for Docker bridge."
+            },
+            "defaultValue": "CIDR"
+        },
+        "agentPoolProfilesType":{
+            "type": "string",
+            "allowedValues": [
+                "VirtualMachineScaleSets",
+                "AvailabilitySet"
+            ],
+            "defaultValue": "VirtualMachineScaleSets"
+        },
+        "OSType": {
+            "type": "string",
+            "defaultValue": "Linux"
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "SIZE_OF_VM"
+        },
+        "count": {
+            "type": "int",
+            "defaultValue": 2
+        },
+        "storageProfile": {
+            "type": "string",
+            "defaultValue": "ManagedDisks"
+        },
+        "VnetName": {
+            "type": "string",
+            "defaultValue": "EXAMPLE_VNET"
+        },
+        "SubnetName": {
+            "type": "string",
+            "defaultValue": "UKW-TESTSUBNET-10.240.0.0"
+        },
+        "PoolName": {
+            "type": "string",
+            "metadata": {
+                "description": "Nodepool Name"
+            },
+            "defaultValue": "EXAMPLE_POOL_NAME"
+        },
+        "WorkSpaceName":{
+            "type": "string",
+            "defaultValue": "EXAMPLE_WORKSPACE"
+        },
+        "omsWorkspaceRG":{
+            "type": "string",
+            "defaultValue": "WORKSPACE_RG_NAME"
+        },
+        "networkPolicy":{
+            "type": "string",
+            "defaultValue": "POLICY_NAME"
+        }
+    
+    },
+    "variables":{
+        "dnsPrefix": "[concat(parameters('resourceName'),'-dns')]",
+        "VnetID": "[resourceId(resourceGroup().Name,'Microsoft.Network/virtualNetworks', parameters('VnetName'))]",
+        "subnetId": "[concat(variables('VnetID'), '/subnets/', parameters('SubnetName'))]",
+        "omsWorkspaceId":"[resourceId(parameters('omsWorkspaceRG'),'microsoft.operationalinsights/workspaces',parameters('WorkSpaceName'))]",
+        "ResourceGroup":"[resourcegroup().Name]",
+        "PrivateCluster":[
+            {
+                "name": "[parameters('PoolName')]",
+                "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+                "count": "[parameters('count')]",
+                "vmSize": "[parameters('vmSize')]",
+                "osType": "[parameters('OSType')]",
+                "storageProfile": "[parameters('osDiskSizeGB')]",
+                "type": "[parameters('agentPoolProfilesType')]",
+                "mode": "System",
+                "vnetSubnetID": "[variables('subnetId')]"
+            }
+        ],
+        "PublicCluster":[
+            {
+                "name": "[parameters('PoolName')]",
+                "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+                "count": "[parameters('count')]",
+                "vmSize": "[parameters('vmSize')]",
+                "osType": "[parameters('OSType')]",
+                "storageProfile": "[parameters('osDiskSizeGB')]",
+                "type": "[parameters('agentPoolProfilesType')]",
+                "mode": "System"
+               
+            }
+        ],
+        "agentPoolProfiles":"[if(equals(parameters('networkPlugin'),'azure'),variables('PrivateCluster'),variables('PublicCluster'))]",
+        "PrivateNetwork":{
+            "loadBalancerSku": "standard",
+            "networkPlugin": "azure",
+            "serviceCidr": "[parameters('serviceCidr')]",
+            "dnsServiceIP": "[parameters('dnsServiceIP')]",
+            "dockerBridgeCidr": "[parameters('dockerBridgeCidr')]",
+            "networkPolicy": "[parameters('networkPolicy')]"
+        },
+        "PublicNetwork":{
+            "loadBalancerSku": "standard",
+            "networkPlugin": "kubenet",
+            "networkPolicy": "[parameters('networkPolicy')]"
+        },
+        "networkProfile":"[if(equals(parameters('networkPlugin'),'azure'),variables('PrivateNetwork'),variables('PublicNetwork'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-03-01",
+            "type": "Microsoft.ContainerService/managedClusters",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "ClusterSubnetRoleAssignmentDeployment"
+            ],
+            "name": "[parameters('resourceName')]",
+            "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "enableRBAC": "[parameters('enableRBAC')]",
+                "dnsPrefix": "[variables('dnsPrefix')]",
+                "agentPoolProfiles": "[variables('agentPoolProfiles')]",
+                "networkProfile":"[variables('networkProfile')]" ,
+                "servicePrincipalProfile": {
+                    "ClientId": "[if(not(empty(parameters('servicePrincipalClientId'))),parameters('servicePrincipalClientId'),json('null'))]",
+                    "Secret": "[if(not(empty(parameters('servicePrincipalClientSecret'))),parameters('servicePrincipalClientSecret'),json('null'))]"
+                },
+                "apiServerAccessProfile": {
+                    "enablePrivateCluster":  "[bool('true')]"
+                },
+                "addonProfiles": {
+                    "httpApplicationRouting": {
+                        "enabled": "[if(not(equals(parameters('enableHttpApplicationRouting'),bool('false'))),parameters('enableHttpApplicationRouting'),bool('false'))]"
+                    },
+                    "omsagent": {
+                        "enabled": "[if(not(empty(parameters('WorkSpaceName'))),bool('true'),bool('false'))]",
+                        "config": {
+                            "logAnalyticsWorkspaceResourceID": "[if(not(empty(parameters('WorkSpaceName'))),parameters('omsWorkspaceId'),json('null'))]"
+                        }
+                    }
+                }
+            },
+            "tags": {},
+            "identity": {
+                "type": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "condition":"[equals(parameters('networkPlugin'),'azure')]",
+            "name": "ClusterSubnetRoleAssignmentDeployment",
+            "apiVersion": "2019-10-01",
+            "resourceGroup": "[resourcegroup().Name]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/virtualNetworks/subnets/providers/roleAssignments",
+                            "apiVersion": "2019-04-01-preview",
+                            "name": "[concat(parameters('VnetName'), '/', parameters('SubnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
+                            "properties": {
+                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7')]",
+                                "principalId": "[parameters('servicePrincipalObjectId')]",
+                                "scope": "[variables('subnetId')]"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "controlPlaneFQDN": {
+            "type": "string",
+            "value": "[reference(concat('Microsoft.ContainerService/managedClusters/', parameters('resourceName'))).privateFQDN]"
+        }
+    }
+}
