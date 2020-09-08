@@ -1,0 +1,1 @@
+The Json file creates private/public kubernetes cluster
