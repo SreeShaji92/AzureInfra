@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The name of the Managed Cluster resource."
             },
-            "defaultValue": "test0004"
+            "defaultValue": "KUBECLUSTER_NAME"
         },
         "location": {
             "type": "string",
@@ -56,21 +56,21 @@
                 "description": "Client ID (used by cloudprovider)."
             },
             "type": "securestring",
-            "defaultValue": "9b7dca1d-6c7a-4114-a310-d3a1bbbd984b"
+            "defaultValue": "UNIQUE_CLIENT_ID"
         },
         "servicePrincipalObjectId": {
             "metadata": {
-                "description": "Client ID (used by cloudprovider)."
+                "description": "Object ID (used by cloudprovider)."
             },
             "type": "securestring",
-            "defaultValue": "b2ef2dd8-9258-4b6c-b397-2e77d4332584"
+            "defaultValue": "UNIQUE_OBJECT_ID"
         },
         "servicePrincipalClientSecret": {
             "metadata": {
                 "description": "The Service Principal Client Secret."
             },
             "type": "securestring",
-            "defaultValue": ".~5_JqNe_HXO2tC06gIsW~MR_O8E0lr_1m"
+            "defaultValue": "UNIQUE_SECRET"
         },
         "enableHttpApplicationRouting": {
             "type": "bool",
@@ -85,21 +85,21 @@
             "metadata": {
                 "description": "A CIDR notation IP range from which to assign service cluster IPs."
             },
-            "defaultValue": "10.0.0.0/16"
+            "defaultValue": "CIDR"
         },
         "dnsServiceIP": {
             "type": "string",
             "metadata": {
                 "description": "Containers DNS server IP address."
             },
-            "defaultValue": "10.0.0.10"
+            "defaultValue": "IP_ADDRESS"
         },
         "dockerBridgeCidr": {
             "type": "string",
             "metadata": {
                 "description": "A CIDR notation IP for Docker bridge."
             },
-            "defaultValue": "172.17.0.1/16"
+            "defaultValue": "CIDR"
         },
         "agentPoolProfilesType":{
             "type": "string",
@@ -115,7 +115,7 @@
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_DS2_v2"
+            "defaultValue": "SIZE_OF_VM"
         },
         "count": {
             "type": "int",
@@ -127,7 +127,7 @@
         },
         "VnetName": {
             "type": "string",
-            "defaultValue": "TEST-DOCKER-UKW-VNET01"
+            "defaultValue": "EXAMPLE_VNET"
         },
         "SubnetName": {
             "type": "string",
@@ -136,21 +136,21 @@
         "PoolName": {
             "type": "string",
             "metadata": {
-                "description": "A CIDR notation IP for Docker bridge."
+                "description": "Nodepool Name"
             },
-            "defaultValue": "testpool"
+            "defaultValue": "EXAMPLE_POOL_NAME"
         },
         "WorkSpaceName":{
             "type": "string",
-            "defaultValue": ""
+            "defaultValue": "EXAMPLE_WORKSPACE"
         },
         "omsWorkspaceRG":{
             "type": "string",
-            "defaultValue": ""
+            "defaultValue": "WORKSPACE_RG_NAME"
         },
         "networkPolicy":{
             "type": "string",
-            "defaultValue": "calico"
+            "defaultValue": "POLICY_NAME"
         }
     
     },
@@ -263,33 +263,6 @@
                                 "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7')]",
                                 "principalId": "[parameters('servicePrincipalObjectId')]",
                                 "scope": "[variables('subnetId')]"
-                            }
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "name": "ClusterMonitoringMetricPulisherRoleAssignmentDepl-20200820125853",
-            "apiVersion": "2017-05-10",
-            "resourceGroup": "[resourcegroup().Name]",
-            "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {},
-                    "variables": {},
-                    "resources": [
-                        {
-                            "type": "Microsoft.ContainerService/managedClusters/providers/roleAssignments",
-                            "apiVersion": "2018-01-01-preview",
-                            "name": "[concat(parameters('resourceName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
-                            "properties": {
-                                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '3913510d-42f4-4e42-8a64-420c390055eb')]",
-                                "principalId": "[parameters('servicePrincipalObjectId')]",
-                                "scope": "[resourceId(resourceGroup().Name,'/Microsoft.ContainerService/managedClusters',parameters('resourceName'))]"
                             }
                         }
                     ]
