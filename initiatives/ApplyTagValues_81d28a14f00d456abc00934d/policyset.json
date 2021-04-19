@@ -1,0 +1,35 @@
+{
+ "properties": {
+  "displayName": "ApplyTagValues",
+  "policyType": "Custom",
+  "metadata": {
+   "category": "Tags",
+   "version": "1.0",
+   "createdBy": "d93e87f1-eb5c-4c55-b865-42e96e6ebe95",
+   "createdOn": "2021-04-19T07:40:00.8967393Z",
+   "updatedBy": null,
+   "updatedOn": null
+  },
+  "parameters": {},
+  "policyDefinitions": [
+   {
+    "policyDefinitionReferenceId": "Apply tag_1",
+    "policyDefinitionId": "/subscriptions/94353732-c8fa-4cc1-bb58-418eb6a6f2e2/providers/Microsoft.Authorization/policyDefinitions/5a545f7e-ff07-472c-a3fc-b999a7abb835",
+    "parameters": {
+     "tagValue": {
+      "value": "prod"
+     }
+    },
+    "groupNames": []
+   }
+  ],
+  "policyDefinitionGroups": [
+   {
+    "name": "testgo"
+   }
+  ]
+ },
+ "id": "/subscriptions/94353732-c8fa-4cc1-bb58-418eb6a6f2e2/providers/Microsoft.Authorization/policySetDefinitions/81d28a14f00d456abc00934d",
+ "type": "Microsoft.Authorization/policySetDefinitions",
+ "name": "81d28a14f00d456abc00934d"
+}
