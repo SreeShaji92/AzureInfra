@@ -1,0 +1,41 @@
+{
+ "properties": {
+  "displayName": "Keyvault",
+  "policyType": "Custom",
+  "metadata": {
+   "category": "Key Vault",
+   "version": "1.0",
+   "createdBy": "4a9049a8-995b-427b-899a-1eb63b4bbccc",
+   "createdOn": "2021-04-28T05:34:40.5066973Z",
+   "updatedBy": null,
+   "updatedOn": null
+  },
+  "parameters": {},
+  "policyDefinitions": [
+   {
+    "policyDefinitionReferenceId": "Key vaults should have purge protection enabled_1",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/0b60c0b2-2dc2-4e1c-b5c9-abbed971de53",
+    "parameters": {
+     "effect": {
+      "value": "Deny"
+     }
+    },
+    "groupNames": []
+   },
+   {
+    "policyDefinitionReferenceId": "Key vaults should have soft delete enabled_1",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/1e66c121-a66a-4b1f-9b83-0fd99bf0fc2d",
+    "parameters": {
+     "effect": {
+      "value": "Deny"
+     }
+    },
+    "groupNames": []
+   }
+  ],
+  "policyDefinitionGroups": []
+ },
+ "id": "/subscriptions/e5ffa02f-c5bb-47d2-8a90-69de44c20bde/providers/Microsoft.Authorization/policySetDefinitions/dda08e6b3f4a45fa81697ba6",
+ "type": "Microsoft.Authorization/policySetDefinitions",
+ "name": "dda08e6b3f4a45fa81697ba6"
+}
